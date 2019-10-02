@@ -77,7 +77,7 @@ function addItem(obj){
         checkbox.classList.add('checkboxItem');
         checkbox.setAttribute('type', 'checkbox');
         deleteButton.append('x');
-        span.append(checkDay(d.getDay()));
+        span.append(checkDay(obj.day));
         todoList[0].append(ListAppendItem(li, checkbox, textItem, span, deleteButton));
         todoInput.value = '';
         todoList[0].onclick = function (event) {
