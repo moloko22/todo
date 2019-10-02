@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<section class="todo">
+    <div class="todo-head"><h1>TODO LIST</h1></div>
+    <p id="errorMessage"></p>
+    <div class="todo-input">
+        <div class="nav">
+                <span id="trigger" class="trigger">
+                  <i></i>
+                  <i></i>
+                  <i></i>
+                </span>
+            <ul id="menu" class="menu">
+                <li><button id="buttonSortDate">Сортировка по дате</button></li>
+                <li><button id="buttonSortText">Сортировка по тексту</button></li>
+                <li><input type="date" id="filterDate" min="2019-08-01" max="2019-12-31">></li>
+                <li><input type="text" id="filterText"></li>
+            </ul>
+        </div>
+        <input id="todo-input" type="text" placeholder="Введите ваше задание">
+        <button id="todo-button">Добавить</button>
+    </div>
+    <div class="todo-list-items">
+        <ul class="list-items"></ul>
+    </div>
+</section>
+<script src="script.js"></script>
+</body>
+</html>
