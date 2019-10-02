@@ -18,9 +18,38 @@ if(month < 10){
     month = '0' + month;
 }
 let TODAY = year + '-' + newMonth + '-' + date;
-let todosItems = [];
+let todosItems = [
+    {
+        id: 0,
+        title: 'moloko',
+        date: '2019-10-01',
+        day: 2,
+        complete: false
+    },
+    {
+        id: 1,
+        title: 'moloko',
+        date: '2019-10-02',
+        day: 1,
+        complete: false
+    },
+    {
+        id: 2,
+        title: 'moloko',
+        date: '2019-09-30',
+        day: 2,
+        complete: true
+    },
+    {
+        id: 3,
+        title: 'moloko',
+        date: '2019-09-30',
+        day: 5,
+        complete: true
+    }
+];
 let newtodoItems = [];
-if(localStorage.getItem('todo') !== undefined && localStorage.getItem('todo') !== null){
+if(localStorage.getItem('todo') !== undefined && localStorage.getItem('todo') !== null && !localStorage.getItem('todo').toString().length){
     todosItems = JSON.parse(localStorage.getItem('todo'));
 }
 function initList(arr){
