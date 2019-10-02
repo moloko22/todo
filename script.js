@@ -8,34 +8,21 @@ const todosortText = document.getElementById('buttonSortText').addEventListener(
 const todoFilterDate = document.getElementById('filterDate').addEventListener('change', function(){filterDatepicker(this.value, todosItems);});
 const todoFilterText = document.getElementById('filterText').addEventListener('keyup', function(){filterText(this.value, todosItems);});
 todoButton.addEventListener('click', function(){createItem(todoInput.value);});
-
-var d = new Date();
-var date = ("0" + d.getDate()).slice(-2);
-var month = d.getMonth();
-var year = d.getFullYear();
+let d = new Date();
+let date = ("0" + d.getDate()).slice(-2);
+let month = d.getMonth();
+let newMonth = month + 1;
+let year = d.getFullYear();
+let itemID = counterItemID();
 if(month < 10){
     month = '0' + month;
 }
-var TODAY = year + '-' + month + '-' + date;
-
-var todosItems = [];
-var newtodoItems = [];
-function getTodos(){
-    var str = localStorage.getItem('todo');
-    todosItems = JSON.parse(str);
-    if(!todosItems){
-        todosItems = [];
-    }else{
-        initList(todosItems);
-    }
+let TODAY = year + '-' + newMonth + '-' + date;
+let todosItems = [];
+let newtodoItems = [];
+if(localStorage.getItem('todo') !== undefined && localStorage.getItem('todo') !== null){
+    todosItems = JSON.parse(localStorage.getItem('todo'));
 }
-getTodos();
-function saveTodos(obj){
-    var str = JSON.stringify(todosItems);
-    localStorage.setItem('todo', str);
-}
-
-
 function initList(arr){
     if(arr){
         arr.forEach(elem=>{
@@ -43,18 +30,73 @@ function initList(arr){
         })
     }
 }
+initList(todosItems);
+function addItem(obj){
+    if(obj.title) {
+        let li = document.createElement('li');
+        let checkbox = document.createElement('input');
+        let textItem = obj.title;
+        let deleteButton = document.createElement('button');
+        let span = document.createElement('span');
+        if(obj.complete){
+            li.classList.toggle('checked');
+            checkbox.checked = obj.complete;
+        }
+        deleteButton.classList.add('deleteItem');
+        deleteButton.setAttribute('dataId', obj.id);
+        checkbox.setAttribute('dataId', obj.id);
+        checkbox.classList.add('checkboxItem');
+        checkbox.setAttribute('type', 'checkbox');
+        deleteButton.append('x');
+        span.append(checkDay(d.getDay()));
+        todoList[0].append(ListAppendItem(li, checkbox, textItem, span, deleteButton));
+        todoInput.value = '';
+        todoList[0].onclick = function (event) {
+            if (event.target.className === 'deleteItem') {
+                let id = event.target.getAttribute('dataId');
+                removeTodo(+id)
+            }
+            if (event.target.className === 'checkboxItem') {
+                itemComplete(event.target);
+            }
+        };
+    }
+}
+function itemComplete (item){
+    let id = item.getAttribute('dataId');
+    item.parentElement.classList.toggle('checked');
+    todosItems.forEach(function(elem){
+       if(elem.id + '' === id){
+           elem.complete = !elem.complete;
+       }
+    });
+    localStorage.setItem('todo', JSON.stringify(todosItems));
+}
+function removeTodo(index){
+    let result = todosItems.filter(elem=> elem.id !== index);
+    localStorage.setItem('todo', JSON.stringify(result));
+    clearList();
+    initList(result);
+    todosItems = result;
+}
+function counterItemID (){
+    let id = 0;
+    return function (){
+        return id++;
+    }
+}
+
 function createItem(title){
     if(title){
-        var id = todosItems.length;
-        var Item = {
-            id: id,
+        let Item = {
+            id: itemID(),
             title: title,
             date: TODAY,
             day: d.getDay(),
             complete: false
         };
-        todosItems[id] = Item;
-        saveTodos(Item);
+        todosItems[todosItems.length] = Item;
+        localStorage.setItem('todo', JSON.stringify(todosItems));
         addItem(Item);
         errorParagraph.style.display = 'none';
     }else{
@@ -62,47 +104,11 @@ function createItem(title){
         errorParagraph.style.display = 'block';
     }
 }
-function itemComplete (item){
-    item.parentElement.classList.toggle('checked');
-}
-function removeTodo(index, item){
-    item.parentElement.remove();
-    todosItems.splice(index, 1);
-    clearList();
-    initList(todosItems);
-    console.log(todosItems);
-}
+
 function clearList(){
     todoList[0].innerHTML = '';
 }
-function addItem(obj){
-    if(obj.title) {
 
-        let li = document.createElement('li');
-        let checkbox = document.createElement('input');
-        let textItem = obj.title;
-        let deleteButton = document.createElement('button');
-        let span = document.createElement('span');
-        deleteButton.classList.add('deleteItem');
-        deleteButton.setAttribute('id', obj.id);
-        checkbox.classList.add('checkboxItem');
-        checkbox.setAttribute('type', 'checkbox');
-        deleteButton.append('x');
-        span.append(checkDay(d.getDay()));
-        todoList[0].append(ListAppendItem(li, checkbox, textItem, span, deleteButton));
-        todoInput.value = '';
-    }
-    todoList[0].onclick = function (event) {
-        if (event.target.className === 'deleteItem') {
-            var id = event.target.getAttribute('id');
-            id = +id;
-            removeTodo(id, event.target);
-        }
-        if (event.target.className === 'checkboxItem') {
-            itemComplete(event.target);
-        }
-    };
-}
 function ListAppendItem(who, checkbox, title, span, button){
     who.append(checkbox);
     who.append(title);
@@ -114,7 +120,7 @@ function open() {
     document.getElementById("menu").classList.toggle("show");
 }
 function checkDay(day){
-    var weekday = new Array(7);
+    let weekday = new Array(7);
     weekday[0] = 'Sun';
     weekday[1] = 'Mon';
     weekday[2] = 'Tue';
@@ -124,9 +130,6 @@ function checkDay(day){
     weekday[6] = 'Sat';
     return weekday[day]
 }
-
-
-
 function sortDate(arr, arr2) {
     if (!arr2.length) {
         clearList();
@@ -171,6 +174,7 @@ function filterDatepicker(date, arr){
     if(arr.length){
         clearList();
         newtodoItems = arr.filter(elem => elem.date === date);
+        console.log(todosItems);
         if(!newtodoItems.length){
             errorParagraph.innerHTML = 'По этой дате, ничего нет!';
             errorParagraph.style.display = 'block';
@@ -185,31 +189,26 @@ function filterDatepicker(date, arr){
 }
 function filterText(value, arr){
     var result = [];
-    if(value.length){
-        var lastSymbol= value.slice(-1);
+    if(arr.length){
         clearList();
         arr.forEach(function(elem){
-            for(var i = value.length-1; i < value.length; ++i){
-                if(elem.title.charAt(i) === lastSymbol){
-                    result.push(elem);
-                }
-            }
+            let ourSTR = elem.title.toLowerCase();
+            let searchSTR = value.toLowerCase();
+           if(ourSTR.indexOf(searchSTR) !== -1){
+               result.push(elem);
+           }
         });
         if(!result.length){
             errorParagraph.innerHTML = 'Совпадения не найдены!';
             errorParagraph.style.display = 'block';
         }else{
             errorParagraph.style.display = 'none';
+            clearList();
             newtodoItems = result;
-            return initList(result);
+            initList(result);
         }
     }else{
         errorParagraph.innerHTML = 'Список пуст, нечего фильтровать!';
         errorParagraph.style.display = 'block';
-        clearList();
-        return initList(arr);
     }
 }
-
-
-
